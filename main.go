@@ -5,12 +5,218 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 func main() {
-	crt()
+	hill(true)
+}
+
+type xy struct {
+	y int
+	x int
+	h [][2]int
+}
+
+func hill(pt2 bool) {
+	// expected results: 534, 525
+	lines := ReadGridRune("hill.txt")
+	grid := make(map[int]map[int]GridPoint)
+	var max [2]int
+	var start [2]int
+	var target [2]int
+	max[0] = len(lines)
+	max[1] = len(lines[0])
+
+	// pre-process to replace S and E with a and z
+	for y, line := range lines {
+		for x, a := range line {
+			switch a {
+			case 'S':
+				lines[y][x] = 'a'
+				start[0] = y
+				start[1] = x
+			case 'E':
+				lines[y][x] = 'z'
+				target[0] = y
+				target[1] = x
+			}
+		}
+	}
+	for y, line := range lines {
+		grid[y] = make(map[int]GridPoint)
+		for x, a := range line {
+			var point GridPoint
+			if y == start[0] && x == start[1] {
+				point.c = 0
+			} else if pt2 && a == 'a' {
+				point.c = 0
+			} else {
+				point.c = 999999
+			}
+			var nbh [4][2]int
+			for i := 0; i < len(nbh); i++ {
+				nbh[i][0] = y
+				nbh[i][1] = x
+			}
+			nbh[0][0]--
+			nbh[1][0]++
+			nbh[2][1]--
+			nbh[3][1]++
+			for _, n := range nbh {
+				if n[0] > -1 && n[1] > -1 && n[0] < max[0] && n[1] < max[1] && lines[n[0]][n[1]] < a+2 {
+					point.n = append(point.n, n)
+				}
+			}
+			grid[y][x] = point
+		}
+	}
+	result := Dijkstra(grid, target)
+	fmt.Println(result)
+}
+
+type Monkey struct {
+	items       []int
+	operation   int
+	modulus     int
+	targets     [2]int
+	inspections int
+}
+
+func monkey2() {
+	// not 14636993466
+	lines := ReadFile("monkey.txt")
+	monkeys := new([8]Monkey)
+	index := 0
+	for i, line := range lines {
+		ints := ExtractInts(line)
+		switch i % 7 {
+		case 0:
+			index = ints[0]
+		case 1:
+			monkeys[index].items = ints
+		case 2:
+			words := strings.Fields(line)
+			if words[5] == "old" {
+				monkeys[index].operation = 0
+			} else if words[4] == "*" {
+				monkeys[index].operation = -ints[0]
+			} else {
+				monkeys[index].operation = ints[0]
+			}
+		case 3:
+			monkeys[index].modulus = ints[0]
+		case 4:
+			monkeys[index].targets[0] = ints[0]
+		case 5:
+			monkeys[index].targets[1] = ints[0]
+		}
+	}
+	modulus := 1
+	for _, monkey := range monkeys {
+		modulus *= monkey.modulus
+	}
+	for i := 0; i < 10000; i++ {
+		for j, monkey := range monkeys {
+			for _, old := range monkey.items {
+				monkeys[j].inspections++
+				new := 0
+				if monkey.operation == 0 {
+					new = old * old
+				} else if monkey.operation < 0 {
+					new = old * -monkey.operation
+				} else {
+					new = old + monkey.operation
+				}
+				new = new % modulus
+				target := 0
+				if new%monkey.modulus == 0 {
+					target = monkey.targets[0]
+				} else {
+					target = monkey.targets[1]
+				}
+				monkeys[target].items = append(monkeys[target].items, new)
+			}
+			monkeys[j].items = []int{}
+		}
+	}
+	var max [2]int
+	for _, monkey := range monkeys {
+		if monkey.inspections > max[0] {
+			max[1] = max[0]
+			max[0] = monkey.inspections
+		} else if monkey.inspections > max[1] {
+			max[1] = monkey.inspections
+		}
+	}
+	fmt.Println(max[0] * max[1])
+}
+
+func monkey() {
+	// expected result: 55930
+	lines := ReadFile("monkey.txt")
+	monkeys := new([8]Monkey)
+	index := 0
+	for i, line := range lines {
+		ints := ExtractInts(line)
+		switch i % 7 {
+		case 0:
+			index = ints[0]
+		case 1:
+			monkeys[index].items = ints
+		case 2:
+			words := strings.Fields(line)
+			if words[5] == "old" {
+				monkeys[index].operation = 0
+			} else if words[4] == "*" {
+				monkeys[index].operation = -ints[0]
+			} else {
+				monkeys[index].operation = ints[0]
+			}
+		case 3:
+			monkeys[index].modulus = ints[0]
+		case 4:
+			monkeys[index].targets[0] = ints[0]
+		case 5:
+			monkeys[index].targets[1] = ints[0]
+		}
+	}
+	for i := 0; i < 20; i++ {
+		for j, monkey := range monkeys {
+			for _, old := range monkey.items {
+				monkeys[j].inspections++
+				new := 0
+				if monkey.operation == 0 {
+					new = old * old
+				} else if monkey.operation < 0 {
+					new = old * -monkey.operation
+				} else {
+					new = old + monkey.operation
+				}
+				new = FloorDivision(new, 3)
+				target := 0
+				if new%monkey.modulus == 0 {
+					target = monkey.targets[0]
+				} else {
+					target = monkey.targets[1]
+				}
+				monkeys[target].items = append(monkeys[target].items, new)
+			}
+			monkeys[j].items = []int{}
+		}
+	}
+	var max [2]int
+	for _, monkey := range monkeys {
+		if monkey.inspections > max[0] {
+			max[1] = max[0]
+			max[0] = monkey.inspections
+		} else if monkey.inspections > max[1] {
+			max[1] = monkey.inspections
+		}
+	}
+	fmt.Println(max[0] * max[1])
 }
 
 func crt2() {
@@ -754,6 +960,18 @@ func ReadGridInt(filename string) [][]int {
 	return grid
 }
 
+func ReadGridRune(filename string) [][]rune {
+	lines := ReadFile(filename)
+	grid := make([][]rune, len(lines))
+	for y, line := range lines {
+		grid[y] = make([]rune, len(line))
+		for x, a := range line {
+			grid[y][x] = a
+		}
+	}
+	return grid
+}
+
 func Chunks(s string, chunkSize int) []string {
 	// https://stackoverflow.com/questions/25686109/split-string-by-length-in-golang
 	if len(s) == 0 {
@@ -800,4 +1018,73 @@ func UniqueWindow(line string, window int) int {
 		}
 	}
 	return pos
+}
+
+func ExtractInts(s string) []int {
+	// https://stackoverflow.com/questions/32987215/find-numbers-in-string-using-golang-regexp
+	re := regexp.MustCompile("[0-9]+")
+	matches := re.FindAllString(s, -1)
+	var ints []int
+	for _, m := range matches {
+		i, err := strconv.Atoi(m)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ints = append(ints, i)
+	}
+	return ints
+}
+
+func FloorDivision(i int, d int) int {
+	i = i - (i % d)
+	i = i / d
+	return i
+}
+
+type GridPoint struct {
+	c int
+	n [][2]int
+}
+
+func Dijkstra(g map[int]map[int]GridPoint, t [2]int) int {
+	// data structure a map of [y][x] coordinates to points
+	// each point has a cost (c) and 0 or more neighbours (n)
+	do := true
+	result := 999999
+	for do {
+		// start from the lowes-cost square
+		shortest := 999999
+		var cur [2]int
+		var point GridPoint
+		for y, line := range g {
+			for x, c := range line {
+				if c.c < shortest {
+					cur[0] = y
+					cur[1] = x
+					point = c
+					shortest = c.c
+				}
+			}
+		}
+		if shortest == 999999 {
+			do = false
+			break
+		}
+
+		cost := point.c + 1
+		for _, n := range point.n {
+			nbh, ok := g[n[0]][n[1]]
+			if ok {
+				if n[0] == t[0] && n[1] == t[1] {
+					result = cost
+					do = false
+				} else if cost < g[n[0]][n[1]].c {
+					nbh.c = cost
+					g[n[0]][n[1]] = nbh
+				}
+			}
+		}
+		delete(g[cur[0]], cur[1])
+	}
+	return result
 }
