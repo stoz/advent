@@ -13,7 +13,357 @@ import (
 )
 
 func main() {
-	sand(true, false)
+	//start := time.Now()
+	xyz4()
+	//duration := time.Since(start)
+	//fmt.Println(duration.Nanoseconds())
+}
+
+type Valve struct {
+	p int
+	n []string
+}
+
+func xyz4() {
+	lines := ReadFile("sample.txt")
+	valves := make(map[string]Valve)
+	grid := make(map[string]StrPoint)
+	var visit []string
+	for _, line := range lines {
+		var valve Valve
+		var point StrPoint
+		words := strings.Fields(line)
+		ints := ExtractInts(line)
+		v := words[1]
+		valve.p = ints[0]
+		point.c = 999999
+		for i, w := range words {
+			if i > 8 {
+				valve.n = append(valve.n, w)
+				point.n = append(point.n, w)
+			}
+		}
+		if valve.p > 0 {
+			visit = append(visit, v)
+		}
+		valves[v] = valve
+		grid[v] = point
+	}
+	//max := 0
+	//pos := "AA"
+
+	fmt.Println(valves)
+	fmt.Println(visit)
+	quickest := make(map[string]map[string][]string)
+	for _, v := range visit {
+		quickest[v] = make(map[string][]string)
+		fmt.Println("Find routes for: " + v)
+		for _, t := range visit {
+			if v != t {
+				gridCopy := make(map[string]StrPoint)
+				for a, b := range grid {
+					gridCopy[a] = b
+				}
+				start := gridCopy[v]
+				start.c = 0
+				gridCopy[v] = start
+				fmt.Println(gridCopy)
+				quickest[v][t] = DijkstraPaths(gridCopy, t)
+				fmt.Println("Find routes for: " + v + " to " + t)
+				fmt.Println(quickest[v][t])
+			}
+		}
+	}
+	//fmt.Println(quickest)
+	for s, q := range quickest {
+		fmt.Println(s, q)
+	}
+}
+
+func xyz3() {
+	// 4350538 too low
+	// 4352518 too low
+	// 4370518 too low
+	lines := ReadFile("input.txt")
+	var dim [4]int
+	cave := make(map[int]map[int]int)
+	sens := make(map[int]map[int]int)
+	for _, line := range lines {
+		ints := ExtractSInts(line)
+		for i, j := range ints {
+			switch i % 2 {
+			case 0: //x
+				if j < dim[2] || dim[2] == 0 {
+					dim[2] = j - 10000000
+				} else if j > dim[3] {
+					dim[3] = j + 10000000
+				}
+			case 1: //y
+				if j < dim[0] || dim[0] == 0 {
+					dim[0] = j - 10
+				} else if j > dim[1] {
+					dim[1] = j + 10
+				}
+			}
+		}
+	}
+	for i := dim[0]; i <= dim[1]; i++ {
+		cave[i] = make(map[int]int)
+	}
+	for _, line := range lines {
+		ints := ExtractSInts(line)
+		var x int
+		var sensor [2]int
+		for i, y := range ints {
+			switch i % 4 {
+			case 0, 2:
+				x = y
+			case 1:
+				cave[y][x] = 3
+				sensor[0] = y
+				sensor[1] = x
+			case 3:
+				cave[y][x] = 4
+				_, ok := sens[sensor[0]]
+				if !ok {
+					sens[sensor[0]] = make(map[int]int)
+				}
+				var diff int
+				if sensor[0] < y {
+					diff += y - sensor[0]
+				} else {
+					diff += sensor[0] - y
+				}
+				if sensor[1] < x {
+					diff += x - sensor[1]
+				} else {
+					diff += sensor[1] - x
+				}
+				sens[sensor[0]][sensor[1]] = diff
+			}
+		}
+	}
+	fmt.Println(dim)
+	// 4000000
+	var lim = 4000000
+	var fin []int
+	cache := make(map[int]bool)
+
+	//13639963409990 too high
+	for sy, line := range sens {
+		for sx, d := range line {
+			// check around the edge
+			e := d + 1
+			for y := sy - e; y <= sy+e; y++ {
+				if y >= 0 && y <= lim {
+					var test [2]int
+					if y < sy {
+						test[0] = sx - e + sy - y
+						test[1] = sx + e - sy - y
+					} else {
+						test[0] = sx - e + y - sy
+						test[1] = sx + e - y - sy
+					}
+					for _, x := range test {
+						if x >= 0 && x <= lim {
+							_, ok := sens[x*lim+y]
+							if !ok {
+								var diff int
+								if sy < y {
+									diff += y - sy
+								} else {
+									diff += sy - y
+								}
+								if sx < x {
+									diff += x - sx
+								} else {
+									diff += sx - x
+								}
+								if diff == e {
+									safe := InRangeOfSensor(y, x, sens)
+									cache[x*lim+y] = true
+									if safe == 0 {
+										fin = append(fin, y, x)
+										fmt.Println("!!!", x*lim+y)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if len(fin) > 2 {
+			fmt.Println("too many", fin)
+			fmt.Println("---", fin[1]*lim+fin[0])
+			os.Exit(1)
+		}
+	}
+	fmt.Println(fin)
+	if len(fin) == 2 {
+		fmt.Print(fin[1]*lim + fin[0])
+	}
+}
+
+func InRangeOfSensor(y, x int, sens map[int]map[int]int) int {
+	for sy, line := range sens {
+		for sx, d := range line {
+			if abs(sy-y)+abs(sx-x) <= d {
+				return 1
+			}
+		}
+	}
+	return 0
+}
+
+func xyz2() {
+	// 4350538 too low
+	// 4352518 too low
+	// 4370518 too low
+	lines := ReadFile("input.txt")
+	var dim [4]int
+	cave := make(map[int]map[int]int)
+	sens := make(map[int]map[int]int)
+	for _, line := range lines {
+		ints := ExtractInts(line)
+		for i, j := range ints {
+			switch i % 2 {
+			case 0: //x
+				if j < dim[2] || dim[2] == 0 {
+					dim[2] = j - 10000000
+				} else if j > dim[3] {
+					dim[3] = j + 10000000
+				}
+			case 1: //y
+				if j < dim[0] || dim[0] == 0 {
+					dim[0] = j - 10
+				} else if j > dim[1] {
+					dim[1] = j + 10
+				}
+			}
+		}
+	}
+	for i := dim[0]; i <= dim[1]; i++ {
+		cave[i] = make(map[int]int)
+	}
+	for _, line := range lines {
+		ints := ExtractInts(line)
+		var x int
+		var sensor [2]int
+		for i, y := range ints {
+			switch i % 4 {
+			case 0, 2:
+				x = y
+			case 1:
+				cave[y][x] = 3
+				sensor[0] = y
+				sensor[1] = x
+			case 3:
+				cave[y][x] = 4
+				_, ok := sens[sensor[0]]
+				if !ok {
+					sens[sensor[0]] = make(map[int]int)
+				}
+				sens[sensor[0]][sensor[1]] = abs(sensor[0]-y) + abs(sensor[1]-x)
+			}
+		}
+	}
+	fmt.Println(dim)
+	// PrintCave2(cave, dim)
+	var sum int
+	y := 2000000
+	for x := dim[2]; x <= dim[3]; x++ {
+		value, ok := cave[y][x]
+		safe := 0
+		if !ok {
+			// square is empty
+			// check if any sensors are in range
+			safe = InRangeOfSensor(y, x, sens)
+		} else {
+			if value == 3 {
+				safe = 1
+			}
+		}
+		sum += safe
+	}
+	fmt.Println(sum)
+}
+
+func xyz() {
+	lines := ReadFile("input.txt")
+	var dim [4]int
+	cave := make(map[int]map[int]int)
+	for _, line := range lines {
+		ints := ExtractInts(line)
+		for i, j := range ints {
+			switch i % 2 {
+			case 0: //x
+				if j < dim[2] || dim[2] == 0 {
+					dim[2] = j - 10
+				} else if j > dim[3] {
+					dim[3] = j + 10
+				}
+			case 1: //y
+				if j < dim[0] || dim[0] == 0 {
+					dim[0] = j - 10
+				} else if j > dim[1] {
+					dim[1] = j + 10
+				}
+			}
+		}
+	}
+	for i := dim[0]; i <= dim[1]; i++ {
+		cave[i] = make(map[int]int)
+	}
+	for _, line := range lines {
+		ints := ExtractInts(line)
+		var x int
+		var sensor [2]int
+		for i, y := range ints {
+			fmt.Println(i)
+			switch i % 4 {
+			case 0, 2:
+				x = y
+			case 1:
+				cave[y][x] = 3
+				sensor[0] = y
+				sensor[1] = x
+			case 3:
+				cave[y][x] = 4
+				//measure distance
+				d := abs(sensor[0]-y) + abs(sensor[1]-x)
+				for dy := sensor[0] - d; dy <= sensor[0]+d; dy++ {
+					// 1, 3, 5 etc
+					width := d - abs(sensor[1]-dy)
+					for dx := sensor[1] - width; dx <= sensor[1]+width; dx++ {
+						_, ok := cave[dy]
+						if ok {
+							_, ok2 := cave[dy][dx]
+							if !ok2 {
+								cave[dy][dx] = 1
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	fmt.Println(dim)
+	PrintCave2(cave, dim)
+	var sum int
+	for _, c := range cave[2000000] {
+		if c == 1 {
+			sum++
+		}
+	}
+	//fmt.Println(sum)
+}
+
+func abs(i int) int {
+	if i < 0 {
+		return -i
+	}
+	return i
 }
 
 func sand(part2, printCave bool) {
@@ -127,6 +477,32 @@ func sand(part2, printCave bool) {
 	fmt.Println(count)
 }
 
+func PrintCave2(cave map[int]map[int]int, dim [4]int) {
+	for y := dim[0]; y <= dim[1]; y++ {
+		var line string
+		for x := dim[2]; x <= dim[3]; x++ {
+			c := "?"
+			i, ok := cave[y][x]
+			if ok {
+				switch i {
+				case 1:
+					c = "#"
+				case 2:
+					c = "o"
+				case 3:
+					c = "S"
+				case 4:
+					c = "B"
+				}
+			} else {
+				c = "."
+			}
+			line += c
+		}
+		fmt.Println(line, y)
+	}
+}
+
 func PrintCave(cave map[int]map[int]int, dim [3]int) {
 	for y := 0; y <= dim[0]; y++ {
 		var line string
@@ -139,6 +515,10 @@ func PrintCave(cave map[int]map[int]int, dim [3]int) {
 					c = "#"
 				case 2:
 					c = "o"
+				case 3:
+					c = "S"
+				case 4:
+					c = "B"
 				}
 			} else {
 				c = "."
@@ -253,21 +633,13 @@ func CompareDistress(left, right any) int {
 	return -1
 }
 
-type xy struct {
-	y int
-	x int
-	h [][2]int
-}
-
 func hill(pt2 bool) {
 	// expected results: 534, 525
 	lines := ReadGridRune("hill.txt")
 	grid := make(map[int]map[int]GridPoint)
-	var max [2]int
+	max := [2]int{len(lines), len(lines[0])}
 	var start [2]int
 	var target [2]int
-	max[0] = len(lines)
-	max[1] = len(lines[0])
 
 	// pre-process to replace S and E with a and z
 	for y, line := range lines {
@@ -473,13 +845,13 @@ func crt2() {
 			add, _ = strconv.Atoi(f[1])
 		}
 		for i := 0; i < cycles; i++ {
-			c := len(output)
+			c := len([]rune(output))
 			if c == x-1 || c == x || c == x+1 {
-				output += "#"
+				output += "█"
 			} else {
-				output += "."
+				output += " "
 			}
-			if len(output) == width {
+			if c == width-1 {
 				fmt.Println(output)
 				output = ""
 			}
@@ -1259,6 +1631,21 @@ func UniqueWindow(line string, window int) int {
 	return pos
 }
 
+func ExtractSInts(s string) []int {
+	// https://stackoverflow.com/questions/32987215/find-numbers-in-string-using-golang-regexp
+	re := regexp.MustCompile(`[-]?\d[\d]*[\.]?[\d{2}]*`)
+	matches := re.FindAllString(s, -1)
+	var ints []int
+	for _, m := range matches {
+		i, err := strconv.Atoi(m)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ints = append(ints, i)
+	}
+	return ints
+}
+
 func ExtractInts(s string) []int {
 	// https://stackoverflow.com/questions/32987215/find-numbers-in-string-using-golang-regexp
 	re := regexp.MustCompile("[0-9]+")
@@ -1324,6 +1711,63 @@ func Dijkstra(g map[int]map[int]GridPoint, t [2]int) int {
 			}
 		}
 		delete(g[cur[0]], cur[1])
+	}
+	return result
+}
+
+type StrPoint struct {
+	c int
+	n []string
+	h []string
+}
+
+func DijkstraPaths(g map[string]StrPoint, t string) []string {
+	// data structure a map of [y][x] coordinates to points
+	// each point has a cost (c) and 0 or more neighbours (n)
+	do := true
+	var result []string
+	for do {
+		// start from the lowes-cost square
+		shortest := 999999
+		var cur string
+		var point StrPoint
+		// select shorted
+		for s, c := range g {
+			if c.c < shortest {
+				cur = s
+				point = c
+				shortest = c.c
+			}
+		}
+		fmt.Println(t, cur, shortest, point, g)
+		if shortest == 999999 {
+			do = false
+			fmt.Println("Couldn't find path")
+			break
+		}
+
+		cost := point.c + 1
+		fmt.Println("!!!", point.n)
+		for _, n := range point.n {
+			fmt.Println("---", n, t)
+			nbh, ok := g[n]
+			if ok {
+				if n == t {
+					result = point.h
+					result = append(result, n)
+					//fmt.Println(result)
+					return result
+				} else if cost < g[n].c {
+					fmt.Println(t, cur, n)
+					nbh.c = cost
+					nbh.h = point.h
+					nbh.h = append(nbh.h, n)
+					g[n] = nbh
+					//fmt.Println(g)
+				}
+			}
+		}
+		delete(g, cur)
 	}
 	return result
 }
