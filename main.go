@@ -2,12 +2,10 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -23,13 +21,18 @@ type SolveCmd struct {
 	Year      int  `arg:"" name:"year" help:"Year of the puzzle." type:"int"`
 	Day       int  `arg:"" name:"day" help:"Day of the puzzle." type:"int"`
 	Part      int  `arg:"" optional:"" name:"part" help:"Part of the puzzle (1 or 2)." type:"int"`
-	Benchmark bool `short:"b" help:"Record runtime"`
+	Benchmark bool `short:"b" help:"Record runtime."`
 	Sample    bool `short:"s" help:"Use sample data."`
 }
 
+type BenchmarkCmd struct {
+	Year int `arg:"" name:"year" help:"Year of the puzzle." type:"int"`
+}
+
 var cli struct {
-	Debug bool     `help:"Enable debug mode."`
-	Solve SolveCmd `cmd:"" help:"Solve a puzzle."`
+	Debug     bool         `help:"Enable debug mode."`
+	Solve     SolveCmd     `cmd:"" help:"Solve a puzzle."`
+	Benchmark BenchmarkCmd `cmd:"" help:"Benchmark all puzzles for a given year."`
 }
 
 func main() {
@@ -51,20 +54,80 @@ func (r *SolveCmd) Run(ctx *Context) error {
 	switch r.Year {
 	case 2022, 22:
 		switch r.Day {
+		case 12:
+			fmt.Println(s2212(f, p))
+		case 13:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22131(f))
+			case 2:
+				fmt.Println(s22132(f))
+			}
+		case 14:
+			fmt.Println(s2214(f, p, cli.Debug))
 		case 18:
 			switch r.Part {
 			case 0, 1:
-				s22181(f)
+				fmt.Println(s22181(f))
 			case 2:
-				s22182(f)
+				fmt.Println(s22182(f))
 			}
-		case 14:
-			s202214(f, p, cli.Debug)
+		case 19:
+			fmt.Println(s2219(f, p, cli.Debug))
 		}
 	}
 	if r.Benchmark {
 		duration := time.Since(start)
-		fmt.Println(duration.Seconds())
+		fmt.Println(duration)
+	}
+	return nil
+}
+
+func (r *BenchmarkCmd) Run(ctx *Context) error {
+	f := "input.txt"
+	switch r.Year {
+	case 2022, 22:
+		var end [2]time.Duration
+		// Day 12
+		start := time.Now()
+		s2212(f, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2212(f, true)
+		end[1] = time.Since(start)
+		fmt.Println("Day 12", end[0], end[1])
+		// Day 13
+		start = time.Now()
+		s22131(f)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22132(f)
+		end[1] = time.Since(start)
+		fmt.Println("Day 13", end[0], end[1])
+		// Day 14
+		start = time.Now()
+		s2214(f, false, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2214(f, true, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 14", end[0], end[1])
+		// Day 18
+		start = time.Now()
+		s22181(f)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22182(f)
+		end[1] = time.Since(start)
+		fmt.Println("Day 18", end[0], end[1])
+		// Day 19
+		start = time.Now()
+		s2219(f, false, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2219(f, true, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 19", end[0], end[1])
 	}
 	return nil
 }
@@ -74,165 +137,6 @@ func abs(i int) int {
 		return -i
 	}
 	return i
-}
-
-func distress2() {
-	lines := ReadFile("distress.txt")
-	var linesInterface []any
-	add := []string{"2", "6"}
-	for _, a := range add {
-		lines = append(lines, "[["+a+"]]")
-	}
-	for _, line := range lines {
-		if line != "" {
-			var data any
-			err := json.Unmarshal([]byte(line), &data)
-			if err != nil {
-				log.Fatal("Cannot unmarshal the json ", err)
-			}
-			linesInterface = append(linesInterface, data)
-		}
-	}
-
-	// sort using the CompareDistress function
-	sort.Slice(linesInterface, func(i, j int) bool {
-		return CompareDistress(linesInterface[i], linesInterface[j]) < 0
-	})
-
-	fmt.Println(linesInterface)
-
-	sum := 1
-	for i, line := range linesInterface {
-		data, _ := json.Marshal(line)
-		for _, a := range add {
-			if string(data) == "[["+a+"]]" {
-				fmt.Println(sum, i+1)
-				sum *= i + 1
-			}
-		}
-	}
-	fmt.Println(sum)
-}
-
-func distress() {
-	lines := ReadFile("distress.txt")
-	var lline, rline string
-	var count int
-
-	for i, line := range lines {
-		switch i % 3 {
-		case 0:
-			lline = line
-		case 1:
-			rline = line
-			// comparison
-			var ldata, rdata any
-			err := json.Unmarshal([]byte(lline), &ldata)
-			if err != nil {
-				log.Fatal("Cannot unmarshal the json ", err)
-			}
-			err = json.Unmarshal([]byte(rline), &rdata)
-			if err != nil {
-				log.Fatal("Cannot unmarshal the json ", err)
-			}
-			if CompareDistress(ldata, rdata) <= 0 {
-				count += ((i - i%3) / 3) + 1
-			}
-		}
-	}
-	fmt.Println(count)
-}
-
-func CompareDistress(left, right any) int {
-	// float64 type assertion
-	l, lok := left.(float64)
-	r, rok := right.(float64)
-	// if both are float64, return the difference
-	if lok && rok {
-		return int(l) - int(r)
-	}
-
-	var llist, rlist []any
-	switch left.(type) {
-	case []any, []float64:
-		llist = left.([]any)
-	case float64:
-		llist = []any{left}
-	}
-	switch right.(type) {
-	case []any, []float64:
-		rlist = right.([]any)
-	case float64:
-		rlist = []any{right}
-	}
-
-	for i := range llist {
-		if len(rlist) <= i {
-			return 1
-		}
-		if ret := CompareDistress(llist[i], rlist[i]); ret != 0 {
-			return ret
-		}
-	}
-	if len(llist) == len(rlist) {
-		return 0
-	}
-	return -1
-}
-
-func hill(pt2 bool) {
-	// expected results: 534, 525
-	lines := ReadGridRune("hill.txt")
-	grid := make(map[int]map[int]GridPoint)
-	max := [2]int{len(lines), len(lines[0])}
-	var start [2]int
-	var target [2]int
-
-	// pre-process to replace S and E with a and z
-	for y, line := range lines {
-		for x, a := range line {
-			switch a {
-			case 'S':
-				lines[y][x] = 'a'
-				start[0] = y
-				start[1] = x
-			case 'E':
-				lines[y][x] = 'z'
-				target[0] = y
-				target[1] = x
-			}
-		}
-	}
-	for y, line := range lines {
-		grid[y] = make(map[int]GridPoint)
-		for x, a := range line {
-			var point GridPoint
-			if y == start[0] && x == start[1] {
-				point.c = 0
-			} else if pt2 && a == 'a' {
-				point.c = 0
-			} else {
-				point.c = 999999
-			}
-			var nbh [4][2]int
-			for i := 0; i < len(nbh); i++ {
-				nbh[i][0] = y
-				nbh[i][1] = x
-			}
-			nbh[0][0]--
-			nbh[1][0]++
-			nbh[2][1]--
-			nbh[3][1]++
-			for _, n := range nbh {
-				if n[0] > -1 && n[1] > -1 && n[0] < max[0] && n[1] < max[1] && lines[n[0]][n[1]] < a+2 {
-					point.n = append(point.n, n)
-				}
-			}
-			grid[y][x] = point
-		}
-	}
-	result := Dijkstra(grid, target)
-	fmt.Println(result)
 }
 
 type Monkey struct {
@@ -1204,6 +1108,21 @@ func ExtractInts(s string) []int {
 			log.Fatal(err)
 		}
 		ints = append(ints, i)
+	}
+	return ints
+}
+
+func ExtractUint8s(s string) []uint8 {
+	// https://stackoverflow.com/questions/32987215/find-numbers-in-string-using-golang-regexp
+	re := regexp.MustCompile("[0-9]+")
+	matches := re.FindAllString(s, -1)
+	var ints []uint8
+	for _, m := range matches {
+		i, err := strconv.Atoi(m)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ints = append(ints, uint8(i))
 	}
 	return ints
 }

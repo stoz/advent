@@ -1,10 +1,7 @@
 package main
 
-import "fmt"
-
-func s22181(filename string) {
+func s22181(filename string) int {
 	lines := ReadFile("./data/2022/18/" + filename)
-	//rops := make(map[int]map[int]map[int]bool)
 	var d [22][22][22]int
 	for _, line := range lines {
 		i := ExtractInts(line)
@@ -37,12 +34,11 @@ func s22181(filename string) {
 			}
 		}
 	}
-	fmt.Println(sum)
+	return sum
 }
 
-func s22182(filename string) {
+func s22182(filename string) int {
 	lines := ReadFile("./data/2022/18/" + filename)
-	//rops := make(map[int]map[int]map[int]bool)
 	// not 2810
 	// not 1781
 	// answer: 2018
@@ -186,9 +182,5 @@ func s22182(filename string) {
 			}
 		}
 	}
-	fmt.Println(sum)
-
-	//for _, a := range d {
-	//fmt.Println(a)
-	//}
+	return sum
 }

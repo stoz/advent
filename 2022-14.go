@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func s202214(filename string, part2, printCave bool) {
+func s2214(filename string, part2, printCave bool) int {
 	// expected results: 808, 26625
 	lines := ReadFile("./data/2022/14/" + filename)
 	cave := make(map[int]map[int]int)
@@ -113,7 +113,7 @@ func s202214(filename string, part2, printCave bool) {
 	if printCave {
 		PrintCave(cave, dim)
 	}
-	fmt.Println(count)
+	return count
 }
 
 func PrintCave2(cave map[int]map[int]int, dim [4]int) {
