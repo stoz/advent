@@ -54,6 +54,15 @@ func (r *SolveCmd) Run(ctx *Context) error {
 	switch r.Year {
 	case 2022, 22:
 		switch r.Day {
+		case 10:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22101(f))
+			case 2:
+				s22102(f, true)
+			}
+		case 11:
+			fmt.Println(s2211(f, p))
 		case 12:
 			fmt.Println(s2212(f, p))
 		case 13:
@@ -74,6 +83,8 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			}
 		case 19:
 			fmt.Println(s2219(f, p, cli.Debug))
+		case 20:
+			fmt.Println(s2220(f, p, cli.Debug))
 		}
 	}
 	if r.Benchmark {
@@ -88,8 +99,24 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 	switch r.Year {
 	case 2022, 22:
 		var end [2]time.Duration
-		// Day 12
+		// Day 10
 		start := time.Now()
+		s22101(f)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22102(f, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 10", end[0], end[1])
+		// Day 11
+		start = time.Now()
+		s2211(f, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2211(f, true)
+		end[1] = time.Since(start)
+		fmt.Println("Day 11", end[0], end[1])
+		// Day 12
+		start = time.Now()
 		s2212(f, false)
 		end[0] = time.Since(start)
 		start = time.Now()
@@ -128,6 +155,14 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s2219(f, true, false)
 		end[1] = time.Since(start)
 		fmt.Println("Day 19", end[0], end[1])
+		// Day 20
+		start = time.Now()
+		s2220(f, false, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2220(f, true, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 20", end[0], end[1])
 	}
 	return nil
 }
@@ -137,204 +172,6 @@ func abs(i int) int {
 		return -i
 	}
 	return i
-}
-
-type Monkey struct {
-	items       []int
-	operation   int
-	modulus     int
-	targets     [2]int
-	inspections int
-}
-
-func monkey2() {
-	// not 14636993466
-	lines := ReadFile("monkey.txt")
-	monkeys := new([8]Monkey)
-	index := 0
-	for i, line := range lines {
-		ints := ExtractInts(line)
-		switch i % 7 {
-		case 0:
-			index = ints[0]
-		case 1:
-			monkeys[index].items = ints
-		case 2:
-			words := strings.Fields(line)
-			if words[5] == "old" {
-				monkeys[index].operation = 0
-			} else if words[4] == "*" {
-				monkeys[index].operation = -ints[0]
-			} else {
-				monkeys[index].operation = ints[0]
-			}
-		case 3:
-			monkeys[index].modulus = ints[0]
-		case 4:
-			monkeys[index].targets[0] = ints[0]
-		case 5:
-			monkeys[index].targets[1] = ints[0]
-		}
-	}
-	modulus := 1
-	for _, monkey := range monkeys {
-		modulus *= monkey.modulus
-	}
-	for i := 0; i < 10000; i++ {
-		for j, monkey := range monkeys {
-			for _, old := range monkey.items {
-				monkeys[j].inspections++
-				new := 0
-				if monkey.operation == 0 {
-					new = old * old
-				} else if monkey.operation < 0 {
-					new = old * -monkey.operation
-				} else {
-					new = old + monkey.operation
-				}
-				new = new % modulus
-				target := 0
-				if new%monkey.modulus == 0 {
-					target = monkey.targets[0]
-				} else {
-					target = monkey.targets[1]
-				}
-				monkeys[target].items = append(monkeys[target].items, new)
-			}
-			monkeys[j].items = []int{}
-		}
-	}
-	var max [2]int
-	for _, monkey := range monkeys {
-		if monkey.inspections > max[0] {
-			max[1] = max[0]
-			max[0] = monkey.inspections
-		} else if monkey.inspections > max[1] {
-			max[1] = monkey.inspections
-		}
-	}
-	fmt.Println(max[0] * max[1])
-}
-
-func monkey() {
-	// expected result: 55930
-	lines := ReadFile("monkey.txt")
-	monkeys := new([8]Monkey)
-	index := 0
-	for i, line := range lines {
-		ints := ExtractInts(line)
-		switch i % 7 {
-		case 0:
-			index = ints[0]
-		case 1:
-			monkeys[index].items = ints
-		case 2:
-			words := strings.Fields(line)
-			if words[5] == "old" {
-				monkeys[index].operation = 0
-			} else if words[4] == "*" {
-				monkeys[index].operation = -ints[0]
-			} else {
-				monkeys[index].operation = ints[0]
-			}
-		case 3:
-			monkeys[index].modulus = ints[0]
-		case 4:
-			monkeys[index].targets[0] = ints[0]
-		case 5:
-			monkeys[index].targets[1] = ints[0]
-		}
-	}
-	for i := 0; i < 20; i++ {
-		for j, monkey := range monkeys {
-			for _, old := range monkey.items {
-				monkeys[j].inspections++
-				new := 0
-				if monkey.operation == 0 {
-					new = old * old
-				} else if monkey.operation < 0 {
-					new = old * -monkey.operation
-				} else {
-					new = old + monkey.operation
-				}
-				new = FloorDivision(new, 3)
-				target := 0
-				if new%monkey.modulus == 0 {
-					target = monkey.targets[0]
-				} else {
-					target = monkey.targets[1]
-				}
-				monkeys[target].items = append(monkeys[target].items, new)
-			}
-			monkeys[j].items = []int{}
-		}
-	}
-	var max [2]int
-	for _, monkey := range monkeys {
-		if monkey.inspections > max[0] {
-			max[1] = max[0]
-			max[0] = monkey.inspections
-		} else if monkey.inspections > max[1] {
-			max[1] = monkey.inspections
-		}
-	}
-	fmt.Println(max[0] * max[1])
-}
-
-func crt2() {
-	// expected result: BJFRHRFU
-	lines := ReadFile("crt.txt")
-	x := 1
-	width := 40
-	output := ""
-	for _, line := range lines {
-		f := strings.Fields(line)
-		cycles := 1
-		add := 0
-		if f[0] == "addx" {
-			cycles = 2
-			add, _ = strconv.Atoi(f[1])
-		}
-		for i := 0; i < cycles; i++ {
-			c := len([]rune(output))
-			if c == x-1 || c == x || c == x+1 {
-				output += "█"
-			} else {
-				output += " "
-			}
-			if c == width-1 {
-				fmt.Println(output)
-				output = ""
-			}
-		}
-		x += add
-	}
-}
-
-func crt() {
-	// expected result: 14620
-	lines := ReadFile("crt.txt")
-	x := 1
-	c := 0
-	interesting := map[int]struct{}{20: {}, 60: {}, 100: {}, 140: {}, 180: {}, 220: {}}
-	sum := 0
-	for _, line := range lines {
-		f := strings.Fields(line)
-		cycles := 1
-		add := 0
-		if f[0] == "addx" {
-			cycles = 2
-			add, _ = strconv.Atoi(f[1])
-		}
-		for i := 0; i < cycles; i++ {
-			c++
-			if _, ok := interesting[c]; ok {
-				sum += x * c
-			}
-		}
-		x += add
-	}
-	fmt.Println(sum)
 }
 
 func rope2() {
