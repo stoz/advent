@@ -146,6 +146,13 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			case 2:
 				fmt.Println(s22222(f, cli.Debug))
 			}
+		case 23:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22231(f, cli.Debug))
+			case 2:
+				fmt.Println(s22232(f, cli.Debug))
+			}
 		}
 	}
 	if r.Benchmark {
