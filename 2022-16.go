@@ -12,7 +12,7 @@ type Valve struct {
 }
 
 func xyz5() {
-	// expected result 2741
+	// expected result: 2741
 	lines := ReadFile("input.txt")
 	valves := make(map[string]Valve)
 	grid := make(map[string]StrPoint)
