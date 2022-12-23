@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func z2() {
-	// expected result 3159
+	// expected result: 3159
 	// repeating pattern input 2647 = 4148 lines
 	// repeating pattern sample 106 = 166 lines
 	// 1000000000000
@@ -104,7 +104,7 @@ func z2() {
 }
 
 func z1() {
-	// expected result 3159
+	// expected result: 3159
 	// repeating pattern input 2647 = 4148 lines
 	// repeating pattern sample 106 = 166 lines
 	// sample pattern might be 7 * 40 (air) * 5 (rocks) = 1400
@@ -260,7 +260,7 @@ func z1() {
 }
 
 func z() {
-	// expected result 3159
+	// expected result: 3159
 	line := ReadLine("sample.txt")
 	var grid [][7]int
 	var pixels [5][5][2]int
