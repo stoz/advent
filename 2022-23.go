@@ -2,14 +2,17 @@ package main
 
 import "fmt"
 
-func s22231(filename string, debug bool) int {
+func s2223(filename string, part2, debug bool) int {
+	// expected results: 3849, 995
 	lines := ReadGridRune("./data/2022/23/" + filename)
 	// padding
-	var og [][]rune
-	pad := 100
-	wid := len(lines[0]) + pad*2
+	steps := 10
+	if part2 {
+		steps = 1000
+	}
+	wid := len(lines[0]) + steps*2
 	var g [][]rune
-	for i := 0; i < pad; i++ {
+	for i := 0; i < steps; i++ {
 		var buf []rune
 		for j := 0; j < wid; j++ {
 			buf = append(buf, '.')
@@ -18,26 +21,34 @@ func s22231(filename string, debug bool) int {
 	}
 	for _, line := range lines {
 		var buf []rune
-		for i := 0; i < pad; i++ {
+		for i := 0; i < steps; i++ {
 			buf = append(buf, '.')
 		}
-		for _, r := range line {
-			buf = append(buf, r)
-		}
-		for i := 0; i < pad; i++ {
+		buf = append(buf, line...)
+		for i := 0; i < steps; i++ {
 			buf = append(buf, '.')
 		}
 		g = append(g, buf)
 	}
-	for i := 0; i < pad; i++ {
+	for i := 0; i < steps; i++ {
 		var buf []rune
 		for j := 0; j < wid; j++ {
 			buf = append(buf, '.')
 		}
 		g = append(g, buf)
 	}
+
+	og := make([][]rune, len(g))
+	for y, line := range g {
+		og[y] = make([]rune, len(line))
+		copy(og[y], line)
+	}
+
 	dir := [4]int{3, 1, 2, 0}
-	for s := 0; s < 10; s++ {
+	for s := 0; s < steps; s++ {
+		for y, line := range g {
+			copy(og[y], line)
+		}
 		var pro [][5]int
 		for y, line := range g {
 			for x, r := range line {
@@ -113,26 +124,64 @@ func s22231(filename string, debug bool) int {
 		case 3:
 			dir[0], dir[1], dir[2], dir[3] = 1, 2, 0, 3
 		}
+
+		if part2 {
+			// compare to og
+			var dif int
+			for y, line := range g {
+				for x, r := range line {
+					if og[y][x] != r {
+						dif++
+					}
+				}
+			}
+			if debug {
+				fmt.Println(dif)
+			}
+			if dif == 0 {
+				return s + 1
+			}
+		}
 	}
 	// print
-	for _, y := range g {
-		var buf string
-		for _, r := range y {
-			buf += string(r)
+	if debug {
+		for _, y := range g {
+			var buf string
+			for _, r := range y {
+				buf += string(r)
+			}
+			fmt.Println(buf)
 		}
-		fmt.Println(buf)
 	}
 	var sum int
-	for _, line := range g {
-		for _, r := range line {
-			if r == '.' {
-				sum++
+	if !part2 {
+		// calculate bounding box
+		var box [4]int
+		for y, line := range g {
+			for x, r := range line {
+				if r == '#' {
+					if y < box[0] || box[0] == 0 {
+						box[0] = y
+					}
+					if x < box[1] || box[1] == 0 {
+						box[1] = x
+					}
+					if y > box[2] {
+						box[2] = y
+					}
+					if x > box[3] {
+						box[3] = x
+					}
+				}
+			}
+		}
+		for y := box[0]; y <= box[2]; y++ {
+			for x := box[1]; x <= box[3]; x++ {
+				if g[y][x] == '.' {
+					sum++
+				}
 			}
 		}
 	}
 	return sum
-}
-
-func s22232(filename string, debug bool) int {
-	return 2
 }

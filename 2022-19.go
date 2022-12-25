@@ -7,6 +7,7 @@ import (
 type RobotState [9]uint8 // 0-3 robots, 4-7 resources, 8 buy mask
 
 func s2219(filename string, part2, debug bool) int {
+	// expected results 1147, 3080
 	lines := ReadFile("./data/2022/19/" + filename)
 	var blueprints [][6]uint8
 	var sum int
@@ -54,9 +55,7 @@ func doBlueprint(blue [6]uint8, steps int, debug bool) int {
 		remain = uint8(steps - i)
 		for _, s := range states {
 			result := simRobot(blue, s, remain)
-			for _, r := range result {
-				newstates = append(newstates, r)
-			}
+			newstates = append(newstates, result...)
 		}
 		// Throw away states with less than the max geode bots
 		for _, s := range newstates {

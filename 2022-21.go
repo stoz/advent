@@ -33,7 +33,7 @@ func s22211(filename string) int {
 			monkeys[name] = monkey
 		}
 	}
-	for true {
+	for {
 		for n, m := range monkeys {
 			if n == "root" && m.set {
 				return m.result
@@ -59,7 +59,6 @@ func s22211(filename string) int {
 			}
 		}
 	}
-	return -1
 }
 
 func s22212(filename string) int {
@@ -88,7 +87,7 @@ func s22212(filename string) int {
 	}
 	min := 1000000000000
 	max := 4000000000000
-	for true {
+	for {
 		// build array to test
 		d := FloorDivision(max-min, 6)
 		test := [6]int{min, min + d, min + d*2, min + d*3, min + d*4, min + d*5}
@@ -132,7 +131,6 @@ func s22212(filename string) int {
 			return -1
 		}
 	}
-	return -1
 }
 
 func monkeyCheck(src map[string]Yell, humn int) (int, bool) {
@@ -143,7 +141,7 @@ func monkeyCheck(src map[string]Yell, humn int) (int, bool) {
 	h := monkeys["humn"]
 	h.result = humn
 	monkeys["humn"] = h
-	for true {
+	for {
 		for n, m := range monkeys {
 			if !m.set && monkeys[m.targets[0]].set && monkeys[m.targets[1]].set {
 				switch m.operation {
@@ -172,5 +170,4 @@ func monkeyCheck(src map[string]Yell, humn int) (int, bool) {
 			}
 		}
 	}
-	return 0, false
 }

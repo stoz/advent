@@ -54,7 +54,6 @@ func s2220(filename string, part2, debug bool) int {
 			}
 			d[i][1] = new
 			if debug {
-				var dbg []int
 				seen := make(map[int]bool)
 				for j := 0; j < l; j++ {
 					// sanity check
@@ -63,11 +62,6 @@ func s2220(filename string, part2, debug bool) int {
 						return -1
 					}
 					seen[d[j][1]] = true
-					for _, a := range d {
-						if a[1] == j {
-							dbg = append(dbg, a[0])
-						}
-					}
 				}
 			}
 		}
