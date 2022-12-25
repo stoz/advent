@@ -121,6 +121,13 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			}
 		case 14:
 			fmt.Println(s2214(f, p, cli.Debug))
+		case 15:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22151(f, cli.Debug))
+			case 2:
+				fmt.Println(s22152(f, cli.Debug))
+			}
 		case 18:
 			switch r.Part {
 			case 0, 1:
@@ -276,6 +283,14 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s2214(f, true, false)
 		end[1] = time.Since(start)
 		fmt.Println("Day 14", end[0], end[1])
+		// Day 15
+		start = time.Now()
+		s22151(f, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22152(f, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 15", end[0], end[1])
 		// Day 18
 		start = time.Now()
 		s22181(f)
