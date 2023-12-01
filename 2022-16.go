@@ -11,9 +11,9 @@ type Valve struct {
 	n []string
 }
 
-func xyz5() {
-	// expected result: 2741
-	lines := ReadFile("input.txt")
+func s22161(filename string, debug bool) int {
+	// expected result: 2077
+	lines := ReadFile("./data/2022/16/" + filename)
 	valves := make(map[string]Valve)
 	grid := make(map[string]StrPoint)
 	var visit []string
@@ -37,9 +37,6 @@ func xyz5() {
 		valves[v] = valve
 		grid[v] = point
 	}
-	//pos := "AA"
-
-	//fmt.Println(valves)
 	visit2 := visit
 	visit2 = append(visit2, "AA")
 	quickest := make(map[string]map[string]int)
@@ -58,12 +55,94 @@ func xyz5() {
 			}
 		}
 	}
-	//fmt.Println(quickest)
-	for s, q := range quickest {
-		fmt.Println(s, q)
+	if debug {
+		for s, q := range quickest {
+			fmt.Println(s, q)
+		}
+		fmt.Println(visit)
 	}
 
-	fmt.Println(visit)
+	// permutations
+	perms := Per("AA", visit, quickest, false)
+
+	// Threads
+	if debug {
+		fmt.Println("Threads:", len(perms))
+	}
+	max := 0
+	var wg sync.WaitGroup
+	wg.Add(len(perms))
+	var results []int
+	for i := 0; i < len(perms); i++ {
+		go func(i int) {
+			defer wg.Done()
+			test := simValves("AA", 30, perms[i], quickest, valves)
+			results = append(results, test)
+		}(i)
+	}
+	wg.Wait()
+	for _, i := range results {
+		if i > max {
+			max = i
+		}
+	}
+	if debug {
+		fmt.Println(len(results))
+	}
+	return max
+}
+
+func s22162(filename string, debug bool) int {
+	// expected result: 2741
+	lines := ReadFile("./data/2022/16/" + filename)
+	valves := make(map[string]Valve)
+	grid := make(map[string]StrPoint)
+	var visit []string
+	for _, line := range lines {
+		var valve Valve
+		var point StrPoint
+		words := strings.Fields(line)
+		ints := ExtractInts(line)
+		v := words[1]
+		valve.p = ints[0]
+		point.c = 999999
+		for i, w := range words {
+			if i > 8 {
+				valve.n = append(valve.n, w[:2])
+				point.n = append(point.n, w[:2])
+			}
+		}
+		if valve.p > 0 {
+			visit = append(visit, v)
+		}
+		valves[v] = valve
+		grid[v] = point
+	}
+	visit2 := visit
+	visit2 = append(visit2, "AA")
+	quickest := make(map[string]map[string]int)
+	for _, v := range visit2 {
+		quickest[v] = make(map[string]int)
+		for _, t := range visit {
+			if v != t {
+				gridCopy := make(map[string]StrPoint)
+				for a, b := range grid {
+					gridCopy[a] = b
+				}
+				start := gridCopy[v]
+				start.c = 0
+				gridCopy[v] = start
+				quickest[v][t] = DijkstraPaths(gridCopy, t)
+			}
+		}
+	}
+
+	if debug {
+		for s, q := range quickest {
+			fmt.Println(s, q)
+		}
+		fmt.Println(visit)
+	}
 
 	// "compress" to ints
 	lookup := make(map[string]int)
@@ -87,13 +166,17 @@ func xyz5() {
 		valveInt[lookup[valvea]] = valveb
 	}
 
-	fmt.Println(visitInt)
+	if debug {
+		fmt.Println(visitInt)
+	}
 
 	// permutations
 	perms := PerInt(0, visitInt, quickestInt, true)
 
 	// Threads
-	fmt.Println("Threads:", len(perms))
+	if debug {
+		fmt.Println("Threads:", len(perms))
+	}
 	max := 0
 	var wg sync.WaitGroup
 	wg.Add(len(perms))
@@ -132,90 +215,10 @@ func xyz5() {
 			max = i
 		}
 	}
-	fmt.Println(len(results))
-	fmt.Println(max)
-}
-
-func xyz4() {
-	// too high 3252, 2727, 3145
-	// not 1795
-	// expected result: 2077
-	lines := ReadFile("input.txt")
-	valves := make(map[string]Valve)
-	grid := make(map[string]StrPoint)
-	var visit []string
-	for _, line := range lines {
-		var valve Valve
-		var point StrPoint
-		words := strings.Fields(line)
-		ints := ExtractInts(line)
-		v := words[1]
-		valve.p = ints[0]
-		point.c = 999999
-		for i, w := range words {
-			if i > 8 {
-				valve.n = append(valve.n, w[:2])
-				point.n = append(point.n, w[:2])
-			}
-		}
-		if valve.p > 0 {
-			visit = append(visit, v)
-		}
-		valves[v] = valve
-		grid[v] = point
+	if debug {
+		fmt.Println(len(results))
 	}
-	//pos := "AA"
-
-	//fmt.Println(valves)
-	visit2 := visit
-	visit2 = append(visit2, "AA")
-	quickest := make(map[string]map[string]int)
-	for _, v := range visit2 {
-		quickest[v] = make(map[string]int)
-		for _, t := range visit {
-			if v != t {
-				gridCopy := make(map[string]StrPoint)
-				for a, b := range grid {
-					gridCopy[a] = b
-				}
-				start := gridCopy[v]
-				start.c = 0
-				gridCopy[v] = start
-				quickest[v][t] = DijkstraPaths(gridCopy, t)
-			}
-		}
-	}
-	//fmt.Println(quickest)
-	for s, q := range quickest {
-		fmt.Println(s, q)
-	}
-
-	fmt.Println(visit)
-
-	// permutations
-	perms := Per("AA", visit, quickest, false)
-
-	// Threads
-	fmt.Println("Threads:", len(perms))
-	max := 0
-	var wg sync.WaitGroup
-	wg.Add(len(perms))
-	var results []int
-	for i := 0; i < len(perms); i++ {
-		go func(i int) {
-			defer wg.Done()
-			test := simValves("AA", 30, perms[i], quickest, valves)
-			results = append(results, test)
-		}(i)
-	}
-	wg.Wait()
-	for _, i := range results {
-		if i > max {
-			max = i
-		}
-	}
-	fmt.Println(len(results))
-	fmt.Println(max)
+	return max
 }
 
 func PerInt(start int, visit []int, quickest map[int]map[int]int, split bool) [][]int {
@@ -392,46 +395,6 @@ func simValves(start string, cycles int, visit []string, quickest map[string]map
 			wait = quickest[start][v] - 1
 			start = v
 			flip = true
-		}
-	}
-	//fmt.Println(total)
-	return total
-}
-
-func simValvesOld(start string, visit []string, quickest map[string]map[string]int, valves map[string]Valve) int {
-	//fmt.Println(visit)
-	sample := []string{"DD", "BB", "JJ", "HH", "EE", "CC"}
-	debug := true
-	for a, b := range visit {
-		if sample[a] != b {
-			debug = false
-		}
-	}
-	var pressure, total, i int
-	var flip bool
-	for i < 31 {
-		if flip {
-			i++
-			total += pressure
-			pressure += valves[start].p
-			flip = false
-		} else if len(visit) > 0 && i >= quickest[start][visit[0]] {
-			var v string
-			v, visit = visit[0], visit[1:]
-			i += quickest[start][v]
-			total += pressure * quickest[start][v]
-			if debug {
-				fmt.Println("---", i, pressure, quickest[start][v])
-			}
-			//fmt.Println(quickest[start][v], start, v, quickest)
-			start = v
-			flip = true
-		} else {
-			i++
-			total += pressure
-		}
-		if debug {
-			fmt.Println(i, start, pressure, total)
 		}
 	}
 	//fmt.Println(total)

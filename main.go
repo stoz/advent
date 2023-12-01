@@ -51,6 +51,11 @@ func (r *SolveCmd) Run(ctx *Context) error {
 	}
 	start := time.Now()
 	switch r.Year {
+	case 2021, 21:
+		switch r.Day {
+		case 4:
+			//fmt.Println(s21041(f, cli.Debug))
+		}
 	case 2022, 22:
 		switch r.Day {
 		case 1:
@@ -128,6 +133,20 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			case 2:
 				fmt.Println(s22152(f, cli.Debug))
 			}
+		case 16:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22161(f, cli.Debug))
+			case 2:
+				fmt.Println(s22162(f, cli.Debug))
+			}
+		case 17:
+			switch r.Part {
+			case 0, 1:
+				fmt.Println(s22171(f))
+			case 2:
+				fmt.Println(s22172(f))
+			}
 		case 18:
 			switch r.Part {
 			case 0, 1:
@@ -157,6 +176,9 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			fmt.Println(s2223(f, p, cli.Debug))
 		case 24:
 			fmt.Println(s2224(f, p, cli.Debug))
+		case 25:
+			// There is no part 2 for day 25
+			fmt.Println(s2225(f))
 		}
 	}
 	if r.Benchmark {
@@ -291,6 +313,22 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s22152(f, false)
 		end[1] = time.Since(start)
 		fmt.Println("Day 15", end[0], end[1])
+		// Day 16
+		start = time.Now()
+		s22161(f, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22162(f, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 16", end[0], end[1])
+		// Day 17
+		start = time.Now()
+		s22171(f)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s22172(f)
+		end[1] = time.Since(start)
+		fmt.Println("Day 17", end[0], end[1])
 		// Day 18
 		start = time.Now()
 		s22181(f)
@@ -347,6 +385,11 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s2224(f, true, false)
 		end[1] = time.Since(start)
 		fmt.Println("Day 23", end[0], end[1])
+		// Day 25
+		start = time.Now()
+		s2225(f)
+		end[0] = time.Since(start)
+		fmt.Println("Day 25", end[0])
 	}
 	return nil
 }
