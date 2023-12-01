@@ -180,6 +180,15 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			// There is no part 2 for day 25
 			fmt.Println(s2225(f))
 		}
+	case 2023, 23:
+		switch r.Day {
+		case 1:
+			// Part 2 has different sample data
+			if p && f == "sample.txt" {
+				f = "sample2.txt"
+			}
+			fmt.Println(s2301(f, p, cli.Debug))
+		}
 	}
 	if r.Benchmark {
 		duration := time.Since(start)
@@ -190,9 +199,9 @@ func (r *SolveCmd) Run(ctx *Context) error {
 
 func (r *BenchmarkCmd) Run(ctx *Context) error {
 	f := "input.txt"
+	var end [2]time.Duration
 	switch r.Year {
 	case 2022, 22:
-		var end [2]time.Duration
 		// Day 1
 		start := time.Now()
 		s2201(f, false)
@@ -390,6 +399,15 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s2225(f)
 		end[0] = time.Since(start)
 		fmt.Println("Day 25", end[0])
+	case 2023, 23:
+		// Day 1
+		start := time.Now()
+		s2301(f, false, false)
+		end[0] = time.Since(start)
+		start = time.Now()
+		s2301(f, true, false)
+		end[1] = time.Since(start)
+		fmt.Println("Day 01", end[0], end[1])
 	}
 	return nil
 }
