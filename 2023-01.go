@@ -1,8 +1,24 @@
 package main
 
-func s2301(filename string, part2, debug bool) int {
+import "strconv"
+
+type s2301 Puzzle
+
+func New2301(filename string) s2301 {
+	return s2301{Filename: "./data/2023/01/" + filename}
+}
+
+func (s s2301) Part1() string {
+	return strconv.Itoa(s.Solve(false, false))
+}
+
+func (s s2301) Part2() string {
+	return strconv.Itoa(s.Solve(true, false))
+}
+
+func (s s2301) Solve(part2, debug bool) int {
 	// expected results: 55834, 53221
-	lines := ReadFile("./data/2023/01/" + filename)
+	lines := ReadFile(s.Filename)
 	sum := 0
 	for _, line := range lines {
 		first := -1
