@@ -12,6 +12,17 @@ import (
 	"github.com/alecthomas/kong"
 )
 
+type Solution interface {
+	Part1(filename string, debug bool) string
+	Part2(filename string, debug bool) string
+}
+
+type Puzzle struct {
+	Year     int
+	Day      int
+	Filename string
+}
+
 type Context struct {
 	Debug bool
 }
@@ -187,7 +198,18 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			if p && f == "sample.txt" {
 				f = "sample2.txt"
 			}
-			fmt.Println(s2301(f, p, cli.Debug))
+			s := New2301(f)
+			if p {
+				fmt.Println(s.Part2())
+			} else {
+				fmt.Println(s.Part1())
+			}
+		case 2:
+			if p {
+				fmt.Println(s23022(f, false, cli.Debug))
+			} else {
+				fmt.Println(s23021(f, false, cli.Debug))
+			}
 		}
 	}
 	if r.Benchmark {
@@ -402,10 +424,11 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 	case 2023, 23:
 		// Day 1
 		start := time.Now()
-		s2301(f, false, false)
+		s := New2301(f)
+		s.Part1()
 		end[0] = time.Since(start)
 		start = time.Now()
-		s2301(f, true, false)
+		s.Part2()
 		end[1] = time.Since(start)
 		fmt.Println("Day 01", end[0], end[1])
 	}
