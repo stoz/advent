@@ -216,6 +216,8 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			} else {
 				fmt.Println(s2303(f, false, cli.Debug))
 			}
+		case 4:
+			fmt.Println(s2304(f, p, cli.Debug))
 		}
 	}
 	if r.Benchmark {
