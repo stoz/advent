@@ -218,6 +218,12 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			}
 		case 4:
 			fmt.Println(s2304(f, p, cli.Debug))
+		case 5:
+			if p {
+				fmt.Println(s23052(f, p, cli.Debug))
+			} else {
+				fmt.Println(s23051(f, p, cli.Debug))
+			}
 		}
 	}
 	if r.Benchmark {
