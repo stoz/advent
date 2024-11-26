@@ -3,14 +3,35 @@ package main
 import (
 	"fmt"
 	"slices"
+	"strconv"
 )
 
-func s2309(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/09/" + filename)
+type s2309 Puzzle
+
+func (s *s2309) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2309) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2309) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2309) Solve() (string, error) {
+	return strconv.Itoa(s.Process()), nil
+}
+
+func (s *s2309) Process() int {
 	sum := 0
-	for lineCount, line := range lines {
+	for lineCount, line := range s.Input {
 		values := ExtractSInts(line)
-		if part {
+		if s.Part == 2 {
 			slices.Reverse(values)
 		}
 		var steps [][]int
@@ -34,7 +55,7 @@ func s2309(filename string, part, debug bool) int {
 				notAllZero = false
 			}
 		}
-		if debug && lineCount == 0 {
+		if s.Debug && lineCount == 0 {
 			for _, step := range steps {
 				fmt.Println(step)
 			}

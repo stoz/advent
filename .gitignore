@@ -16,3 +16,6 @@
 
 # macOS
 .DS_Store
+
+# Advent of Code asks participants not to commit their unique puzzle input
+input.txt

@@ -5,24 +5,44 @@ import (
 	"strings"
 )
 
-func s2307(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/07/" + filename)
+type s2307 Puzzle
+
+func (s *s2307) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2307) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2307) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2307) Solve() (string, error) {
+	return strconv.Itoa(s.Process()), nil
+}
+
+func (s *s2307) Process() int {
 	score := 0
-	for i, hand1 := range lines {
+	for i, hand1 := range s.Input {
 		rank := 1
 		var inputs [2]string
 		words1 := strings.Fields(hand1)
 		inputs[0] = words1[0]
-		for j, hand2 := range lines {
+		for j, hand2 := range s.Input {
 			if i != j {
 				words2 := strings.Fields(hand2)
 				inputs[1] = words2[0]
-				if part {
-					if camelCard2(inputs) {
+				if s.Part == 2 {
+					if s.camelCard2(inputs) {
 						rank++
 					}
 				} else {
-					if camelCard(inputs) {
+					if s.camelCard(inputs) {
 						rank++
 					}
 				}
@@ -34,7 +54,7 @@ func s2307(filename string, part, debug bool) int {
 	return score
 }
 
-func camelCard(inputs [2]string) bool {
+func (s *s2307) camelCard(inputs [2]string) bool {
 	var hands [2][5]int
 	var ranks [2]int
 	for i, hand := range inputs {
@@ -119,7 +139,7 @@ func camelCard(inputs [2]string) bool {
 }
 
 // part 2
-func camelCard2(inputs [2]string) bool {
+func (s *s2307) camelCard2(inputs [2]string) bool {
 	var hands [2][5]int
 	var ranks [2]int
 	for i, hand := range inputs {

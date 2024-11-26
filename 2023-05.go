@@ -1,16 +1,45 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
-func s23051(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/05/" + filename)
+type s2305 Puzzle
+
+func (s *s2305) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2305) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2305) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2305) Solve() (string, error) {
+	var number int
+	if s.Part != 2 {
+		number = s.processPart1()
+	} else {
+		number = s.processPart2()
+	}
+	return strconv.Itoa(number), nil
+}
+
+func (s *s2305) processPart1() int {
 	var maps [7][][3]int
 	// build the maps
 	mapIndex := -1
-	for lineIndex, line := range lines {
+	for lineIndex, line := range s.Input {
 		ints := ExtractInts(line)
 		if lineIndex > 0 {
-			previousInts := ExtractInts(lines[lineIndex-1])
+			previousInts := ExtractInts(s.Input[lineIndex-1])
 			if len(ints) == 3 {
 				if len(previousInts) != 3 {
 					mapIndex++
@@ -23,15 +52,15 @@ func s23051(filename string, part, debug bool) int {
 			}
 		}
 	}
-	if debug {
+	if s.Debug {
 		fmt.Println(maps)
 	}
 
 	// iterate through the seeds
-	seeds := ExtractInts(lines[0])
+	seeds := ExtractInts(s.Input[0])
 	var results []int
 	for _, seed := range seeds {
-		if debug {
+		if s.Debug {
 			fmt.Println(seed)
 		}
 		for _, step := range maps {
@@ -42,7 +71,7 @@ func s23051(filename string, part, debug bool) int {
 				}
 			}
 			seed = newSeed
-			if debug {
+			if s.Debug {
 				fmt.Println(newSeed)
 			}
 		}
@@ -57,15 +86,14 @@ func s23051(filename string, part, debug bool) int {
 	return min
 }
 
-func s23052(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/05/" + filename)
+func (s *s2305) processPart2() int {
 	var maps [7][][3]int
 	// build the maps
 	mapIndex := -1
-	for lineIndex, line := range lines {
+	for lineIndex, line := range s.Input {
 		ints := ExtractInts(line)
 		if lineIndex > 0 {
-			previousInts := ExtractInts(lines[lineIndex-1])
+			previousInts := ExtractInts(s.Input[lineIndex-1])
 			if len(ints) == 3 {
 				if len(previousInts) != 3 {
 					mapIndex++
@@ -78,19 +106,19 @@ func s23052(filename string, part, debug bool) int {
 			}
 		}
 	}
-	if debug {
+	if s.Debug {
 		fmt.Println(maps)
 	}
 
 	// iterate through the seeds
-	seeds := ExtractInts(lines[0])
-	if debug {
+	seeds := ExtractInts(s.Input[0])
+	if s.Debug {
 		fmt.Println(seeds)
 	}
 	min := -1
 	for seedIndex, seedRange := range seeds {
 		if seedIndex%2 == 0 {
-			if debug {
+			if s.Debug {
 				fmt.Println(seedIndex)
 			}
 			for xseed := seedRange; xseed < seedRange+seeds[seedIndex+1]; xseed++ {

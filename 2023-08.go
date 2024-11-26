@@ -1,13 +1,42 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
-func s23081(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/08/" + filename)
-	directions := lines[0]
+type s2308 Puzzle
+
+func (s *s2308) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2308) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2308) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2308) Solve() (string, error) {
+	var number int
+	if s.Part != 2 {
+		number = s.processPart1()
+	} else {
+		number = s.processPart2()
+	}
+	return strconv.Itoa(number), nil
+}
+
+func (s *s2308) processPart1() int {
+	directions := s.Input[0]
 	network := make(map[string][2]string)
 	pos := "AAA"
-	for i, line := range lines {
+	for i, line := range s.Input {
 		if i > 1 {
 			var net [2]string
 			net[0] = line[7:10]
@@ -22,7 +51,7 @@ func s23081(filename string, part, debug bool) int {
 			lr = 1
 		}
 		pos = network[pos][lr]
-		if debug {
+		if s.Debug {
 			fmt.Println(pos, lr)
 		}
 		i++
@@ -30,13 +59,12 @@ func s23081(filename string, part, debug bool) int {
 	return i
 }
 
-func s2308(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/08/" + filename)
-	directions := lines[0]
+func (s *s2308) processPart2() int {
+	directions := s.Input[0]
 	network := make(map[string][2]string)
 	var positions []string
 	var results []int
-	for i, line := range lines {
+	for i, line := range s.Input {
 		if i > 1 {
 			var net [2]string
 			net[0] = line[7:10]
@@ -55,14 +83,14 @@ func s2308(filename string, part, debug bool) int {
 				lr = 1
 			}
 			pos = network[pos][lr]
-			if debug {
+			if s.Debug {
 				fmt.Println(pos, lr)
 			}
 			i++
 		}
 		results = append(results, i)
 	}
-	return LCM(15871, 19637, 12643, 14257, 21251, 19099)
+	return LCM(results[0], results[1], results[2:]...)
 }
 
 // greatest common divisor (GCD) via Euclidean algorithm

@@ -5,10 +5,36 @@ import (
 	"strings"
 )
 
-func s23021(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/02/" + filename)
+type s2302 Puzzle
+
+func (s *s2302) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2302) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2302) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2302) Solve() (string, error) {
+	var number int
+	if s.Part != 2 {
+		number = s.processPart1()
+	} else {
+		number = s.processPart2()
+	}
+	return strconv.Itoa(number), nil
+}
+
+func (s *s2302) processPart1() int {
 	score := 0
-	for lineNumber, line := range lines {
+	for lineNumber, line := range s.Input {
 		pass := true
 		words := strings.Fields(line)
 		for i, word := range words {
@@ -36,10 +62,9 @@ func s23021(filename string, part, debug bool) int {
 	return score
 }
 
-func s23022(filename string, part, debug bool) int {
-	lines := ReadFile("./data/2023/02/" + filename)
+func (s *s2302) processPart2() int {
 	score := 0
-	for _, line := range lines {
+	for _, line := range s.Input {
 		var r, g, b int
 		words := strings.Fields(line)
 		for i, word := range words {
