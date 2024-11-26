@@ -4,8 +4,29 @@ import (
 	"strconv"
 )
 
-func s2303(filename string, part, debug bool) int {
-	lines := ReadGridRune("./data/2023/03/" + filename)
+type s2303 Puzzle
+
+func (s *s2303) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2303) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2303) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2303) Solve() (string, error) {
+	return strconv.Itoa(s.Process()), nil
+}
+
+func (s *s2303) Process() int {
+	lines := MakeGridRune(s.Input)
 	sum := 0
 	// part 2
 	var gears [140][140][]int
@@ -55,7 +76,7 @@ func s2303(filename string, part, debug bool) int {
 			}
 		}
 	}
-	if !part {
+	if s.Part != 2 {
 		return sum
 	}
 	sum = 0

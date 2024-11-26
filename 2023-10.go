@@ -1,8 +1,38 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
-func s23101(filename string, part, debug bool) int {
+type s2310 Puzzle
+
+func (s *s2310) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
+}
+
+func (s *s2310) SetInput(input []string) error {
+	s.Input = input
+	return nil
+}
+
+func (s *s2310) SetPart(part int) error {
+	s.Part = part
+	return nil
+}
+
+func (s *s2310) Solve() (string, error) {
+	var number int
+	if s.Part != 2 {
+		number = s.processPart1()
+	} else {
+		number = s.processPart2()
+	}
+	return strconv.Itoa(number), nil
+}
+
+func (s *s2310) processPart1() int {
 	// exists for each pipe type
 	exits := make(map[rune][2][4]int)
 	exits['|'] = [2][4]int{{-1, 0}, {1, 0}}
@@ -11,7 +41,7 @@ func s23101(filename string, part, debug bool) int {
 	exits['J'] = [2][4]int{{-1, 0}, {0, -1}}
 	exits['7'] = [2][4]int{{0, -1}, {1, 0}}
 	exits['F'] = [2][4]int{{1, 0}, {0, 1}}
-	grid := ReadGridRune("./data/2023/10/" + filename)
+	grid := MakeGridRune(s.Input)
 	// find start
 	var x, y, prevX, prevY, nextX, nextY int
 	for yval, yy := range grid {
@@ -22,7 +52,7 @@ func s23101(filename string, part, debug bool) int {
 			}
 		}
 	}
-	if debug {
+	if s.Debug {
 		fmt.Println(y, x)
 	}
 	// sample = F input = 7
@@ -46,14 +76,16 @@ func s23101(filename string, part, debug bool) int {
 		y = nextY
 		x = nextX
 		pipe = grid[y][x]
-		fmt.Println(prevY, prevX, y, x)
+		if s.Debug {
+			fmt.Println(prevY, prevX, y, x)
+		}
 	}
 
 	return counter / 2
 }
 
 // too high: 660
-func s23102(filename string, part, debug bool) int {
+func (s *s2310) processPart2() int {
 	// exists for each pipe type
 	exits := make(map[rune][2][4]int)
 	bigGrid := make(map[int]map[int]int)
@@ -63,7 +95,7 @@ func s23102(filename string, part, debug bool) int {
 	exits['J'] = [2][4]int{{-1, 0}, {0, -1}}
 	exits['7'] = [2][4]int{{0, -1}, {1, 0}}
 	exits['F'] = [2][4]int{{1, 0}, {0, 1}}
-	grid := ReadGridRune("./data/2023/10/" + filename)
+	grid := MakeGridRune(s.Input)
 	for i := -1; i < len(grid)*2; i++ {
 		bigGrid[i] = make(map[int]int)
 	}
@@ -77,7 +109,7 @@ func s23102(filename string, part, debug bool) int {
 			}
 		}
 	}
-	if debug {
+	if s.Debug {
 		fmt.Println(y, x)
 	}
 	// sample = F input = 7
@@ -152,7 +184,7 @@ func s23102(filename string, part, debug bool) int {
 				buf += ","
 			}
 		}
-		if debug {
+		if s.Debug {
 			fmt.Println(buf)
 		}
 	}

@@ -12,15 +12,30 @@ import (
 	"github.com/alecthomas/kong"
 )
 
-type Solution interface {
-	Part1(filename string, debug bool) string
-	Part2(filename string, debug bool) string
+type Solver interface {
+	SetDebug(bool) error
+	SetInput([]string) error
+	SetPart(int) error
+	Solve() (string, error)
+}
+
+func PrintSolution(s Solver) {
+	text, err := s.Solve()
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	} else {
+		fmt.Println(text)
+	}
 }
 
 type Puzzle struct {
 	Year     int
 	Day      int
-	Filename string
+	Debug    bool
+	Filename string // delete this
+	Input    []string
+	Part     int
+	Sample   bool
 }
 
 type Context struct {
@@ -192,53 +207,38 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			fmt.Println(s2225(f))
 		}
 	case 2023, 23:
+		var data []string
+		var z Solver
 		switch r.Day {
 		case 1:
-			// Part 2 has different sample data
+			// Day 1 Part 2 has different sample data
 			if p && f == "sample.txt" {
 				f = "sample2.txt"
 			}
-			s := New2301(f)
-			if p {
-				fmt.Println(s.Part2())
-			} else {
-				fmt.Println(s.Part1())
-			}
+			z = &s2301{}
 		case 2:
-			if p {
-				fmt.Println(s23022(f, false, cli.Debug))
-			} else {
-				fmt.Println(s23021(f, false, cli.Debug))
-			}
+			z = &s2302{}
 		case 3:
-			if p {
-				fmt.Println(s2303(f, true, cli.Debug))
-			} else {
-				fmt.Println(s2303(f, false, cli.Debug))
-			}
+			z = &s2303{}
 		case 4:
-			fmt.Println(s2304(f, p, cli.Debug))
+			z = &s2304{}
 		case 5:
-			if p {
-				fmt.Println(s23052(f, p, cli.Debug))
-			} else {
-				fmt.Println(s23051(f, p, cli.Debug))
-			}
+			z = &s2305{}
 		case 6:
-			fmt.Println(s2306(f, p, cli.Debug))
+			z = &s2306{}
 		case 7:
-			fmt.Println(s2307(f, p, cli.Debug))
+			z = &s2307{}
 		case 8:
-			fmt.Println(s2308(f, p, cli.Debug))
+			z = &s2308{}
 		case 9:
-			fmt.Println(s2309(f, p, cli.Debug))
+			z = &s2309{}
 		case 10:
-			if p {
-				fmt.Println(s23102(f, p, cli.Debug))
-			} else {
-				fmt.Println(s23101(f, p, cli.Debug))
-			}
+			z = &s2310{}
 		}
+		data = ReadFile(fmt.Sprintf("./data/2023/%02d/%s", r.Day, f))
+		z.SetInput(data)
+		z.SetPart(r.Part)
+		PrintSolution(z)
 	}
 	if r.Benchmark {
 		duration := time.Since(start)
@@ -449,16 +449,6 @@ func (r *BenchmarkCmd) Run(ctx *Context) error {
 		s2225(f)
 		end[0] = time.Since(start)
 		fmt.Println("Day 25", end[0])
-	case 2023, 23:
-		// Day 1
-		start := time.Now()
-		s := New2301(f)
-		s.Part1()
-		end[0] = time.Since(start)
-		start = time.Now()
-		s.Part2()
-		end[1] = time.Since(start)
-		fmt.Println("Day 01", end[0], end[1])
 	}
 	return nil
 }

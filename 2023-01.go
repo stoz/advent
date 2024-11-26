@@ -1,26 +1,35 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type s2301 Puzzle
 
-func New2301(filename string) s2301 {
-	return s2301{Filename: "./data/2023/01/" + filename}
+func (s *s2301) SetDebug(debug bool) error {
+	s.Debug = debug
+	return nil
 }
 
-func (s s2301) Part1() string {
-	return strconv.Itoa(s.Solve(false, false))
+func (s *s2301) SetInput(input []string) error {
+	s.Input = input
+	return nil
 }
 
-func (s s2301) Part2() string {
-	return strconv.Itoa(s.Solve(true, false))
+func (s *s2301) SetPart(part int) error {
+	s.Part = part
+	return nil
 }
 
-func (s s2301) Solve(part2, debug bool) int {
+func (s *s2301) Solve() (string, error) {
+	return strconv.Itoa(s.Process()), nil
+}
+
+func (s *s2301) Process() int {
 	// expected results: 55834, 53221
-	lines := ReadFile(s.Filename)
+	part2 := s.Part == 2
 	sum := 0
-	for _, line := range lines {
+	for _, line := range s.Input {
 		first := -1
 		last := -1
 		for i, c := range line {
