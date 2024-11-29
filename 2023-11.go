@@ -30,65 +30,120 @@ func (s *s2311) Process() int {
 	lines := MakeGridRune(s.Input)
 
 	universe := make(map[int]map[int]bool)
+	universe2 := make(map[int]map[int]bool)
 
 	if s.Debug {
-		for _, line := range lines {
-			fmt.Printf("%q\n", line)
+		fmt.Println("Original Universe")
+		for _, line := range s.Input {
+			fmt.Println(line)
 		}
 	}
 
 	// first check for columns that need to be expanded
 	index := 0
+	// iterate through the columns
 	for i := 0; i < len(lines[0]); i++ {
+		// set empty flag, trip if any cell contains #
 		isEmpty := true
-		for y, line := range lines {
+		// iterate through the rows
+		for j := 0; j < len(lines); j++ {
 			if i == 0 {
-				universe[y] = make(map[int]bool)
+				universe[j] = make(map[int]bool)
 			}
-			if line[i] == '#' {
+			if lines[j][i] == '#' {
 				isEmpty = false
 			}
 		}
-		loops := 1
-		if isEmpty {
-			loops = 2
+		for j := 0; j < len(lines); j++ {
+			universe[j][index] = lines[j][i] == '#'
 		}
-		for j := 0; j < loops; j++ {
-			for y, line := range lines {
-				universe[y][index] = line[i] == '#'
+		index++
+		if isEmpty {
+			for j := 0; j < len(lines); j++ {
+				universe[j][index] = lines[j][i] == '#'
 			}
 			index++
 		}
 	}
 
 	if s.Debug {
-		for _, line := range universe {
-			fmt.Println(line)
+		fmt.Println("Horizontally Expanded Universe")
+		for x := 0; x < len(universe); x++ {
+			debugString := ""
+			for y := 0; y < len(universe[x]); y++ {
+				if universe[x][y] {
+					debugString += "#"
+				} else {
+					debugString += "."
+				}
+			}
+			fmt.Println(debugString)
 		}
 	}
 
-	i := 0
-	for _, line := range lines {
+	// now check for rows that need to be expanded
+	index = 0
+	// iterate through the rows
+	for x := 0; x < len(universe); x++ {
+		// set empty flag, trip if any cell contains #
 		isEmpty := true
-		for _, r := range line {
-			if r == '#' {
+		// iterate through the columns
+		for y := 0; y < len(universe[x]); y++ {
+			if universe[x][y] {
 				isEmpty = false
 			}
 		}
-		if isEmpty {
-			for j := len(universe); j > i; j++ {
-				universe[j] = universe[j-1]
+		for y := 0; y < len(universe[x]); y++ {
+			if index > len(universe2)-1 {
+				universe2[index] = make(map[int]bool)
 			}
-			i++
+			universe2[index][y] = universe[x][y]
 		}
-		i++
+		index++
+		if isEmpty {
+			for y := 0; y < len(universe[x]); y++ {
+				if index > len(universe2)-1 {
+					universe2[index] = make(map[int]bool)
+				}
+				universe2[index][y] = universe[x][y]
+			}
+			index++
+		}
 	}
 
 	if s.Debug {
-		for _, line := range universe {
-			fmt.Println(line)
+		fmt.Println("Vertically Expanded Universe")
+		for x := 0; x < len(universe2); x++ {
+			debugString := ""
+			for y := 0; y < len(universe2[x]); y++ {
+				if universe2[x][y] {
+					debugString += "#"
+				} else {
+					debugString += "."
+				}
+			}
+			fmt.Println(debugString)
 		}
 	}
 
-	return len(lines)
+	// get coordinates of each galaxy
+	coordinates := [][2]int{}
+	for x := 0; x < len(universe2); x++ {
+		for y := 0; y < len(universe2[x]); y++ {
+			if universe2[x][y] {
+				coordinates = append(coordinates, [2]int{x, y})
+			}
+		}
+	}
+
+	sum := 0
+	for c, i := range coordinates {
+		for d, j := range coordinates {
+			if d > c {
+				sum += abs(i[0]-j[0]) + abs(i[1]-j[1])
+			}
+		}
+	}
+
+	return sum
 }
