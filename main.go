@@ -242,6 +242,18 @@ func (r *SolveCmd) Run(ctx *Context) error {
 		z.SetInput(data)
 		z.SetPart(r.Part)
 		PrintSolution(z)
+	case 2024, 24:
+		var data []string
+		var z Solver
+		switch r.Day {
+		case 1:
+			z = &s2401{}
+		}
+		data = ReadFile(fmt.Sprintf("./data/2024/%02d/%s", r.Day, f))
+		z.SetDebug(cli.Debug)
+		z.SetInput(data)
+		z.SetPart(r.Part)
+		PrintSolution(z)
 	}
 	if r.Benchmark {
 		duration := time.Since(start)
