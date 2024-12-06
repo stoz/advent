@@ -254,6 +254,8 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			z = &s2403{}
 		case 4:
 			z = &s2404{}
+		case 5:
+			z = &s2405{}
 		}
 		data = ReadFile(fmt.Sprintf("./data/2024/%02d/%s", r.Day, f))
 		z.SetDebug(cli.Debug)
