@@ -189,3 +189,38 @@ func Test_s2405(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "4743", result)
 }
+
+func Test_s2406(t *testing.T) {
+	var s s2406
+
+	s.SetInput([]string{
+		"....#.....",
+		".........#",
+		"..........",
+		"..#.......",
+		".......#..",
+		"..........",
+		".#..^.....",
+		"........#.",
+		"#.........",
+		"......#...",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "41", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "6", result)
+
+	s.SetInput(ReadFile("./data/2024/06/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "5162", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1909", result)
+}
