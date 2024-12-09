@@ -224,3 +224,107 @@ func Test_s2406(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "1909", result)
 }
+
+func Test_s2407(t *testing.T) {
+	var s s2407
+
+	s.SetInput([]string{
+		"190: 10 19",
+		"3267: 81 40 27",
+		"83: 17 5",
+		"156: 15 6",
+		"7290: 6 8 6 15",
+		"161011: 16 10 13",
+		"192: 17 8 14",
+		"21037: 9 7 18 13",
+		"292: 11 6 16 20",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "3749", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "11387", result)
+
+	s.SetInput(ReadFile("./data/2024/07/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "6083020304036", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "59002246504791", result)
+}
+
+func Test_s2408(t *testing.T) {
+	var s s2408
+
+	s.SetInput([]string{
+		"............",
+		"........0...",
+		".....0......",
+		".......0....",
+		"....0.......",
+		"......A.....",
+		"............",
+		"............",
+		"........A...",
+		".........A..",
+		"............",
+		"............",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "14", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "34", result)
+
+	s.SetInput(ReadFile("./data/2024/08/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "371", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1229", result)
+}
+
+func Test_s2409(t *testing.T) {
+	var s s2409
+
+	s.SetInput([]string{
+		"2333133121414131402",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1928", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "2858", result)
+
+	s.SetInput(ReadFile("./data/2024/09/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "6323641412437", result)
+}
+
+// split into two tests because runtime is approaching 30 seconds
+func Test_s2409Part2(t *testing.T) {
+	var s s2409
+
+	s.SetInput(ReadFile("./data/2024/09/input.txt"))
+	s.SetPart(2)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "6351801932670", result)
+}
