@@ -361,3 +361,30 @@ func Test_s2410(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "928", result)
 }
+
+func Test_s2411(t *testing.T) {
+	var s s2411
+
+	s.SetInput([]string{
+		"125 17",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "55312", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	// This is not given on the AoC website, but is the expected result
+	assert.Equal(t, "65601038650482", result)
+
+	s.SetInput(ReadFile("./data/2024/11/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "235850", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "279903140844645", result)
+}
