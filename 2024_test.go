@@ -388,3 +388,38 @@ func Test_s2411(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "279903140844645", result)
 }
+
+func Test_s2412(t *testing.T) {
+	var s s2412
+
+	s.SetInput([]string{
+		"RRRRIICCFF",
+		"RRRRIICCCF",
+		"VVRRRCCFFF",
+		"VVRCCCJFFF",
+		"VVVVCJJCFE",
+		"VVIVCCJJEE",
+		"VVIIICJJEE",
+		"MIIIIIJJEE",
+		"MIIISIJEEE",
+		"MMMISSJEEE",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1930", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1206", result)
+
+	s.SetInput(ReadFile("./data/2024/12/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "1421958", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "885394", result)
+}
