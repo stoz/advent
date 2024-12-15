@@ -132,7 +132,7 @@ func (s *s2412) processPart2() int {
 				area := 0
 				// setup 4 grids, one for each direction, that we can use to track which side the perimeter is part of
 				var sides [4]map[int]map[int]rune
-				for d, _ := range directions {
+				for d := range directions {
 					sides[d] = make(map[int]map[int]rune)
 					for yy := -2; yy < len(grid)+2; yy++ {
 						sides[d][yy] = make(map[int]rune)
@@ -159,7 +159,7 @@ func (s *s2412) processPart2() int {
 				// count distinct sides
 				perimeter := 0
 				if target == 'R' {
-					for d, _ := range directions {
+					for d := range directions {
 						for yy := -2; yy < yMax+2; yy++ {
 							debugString := ""
 							for xx := -2; xx < xMax+2; xx++ {

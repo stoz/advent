@@ -423,3 +423,76 @@ func Test_s2412(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "885394", result)
 }
+
+func Test_s2413(t *testing.T) {
+	var s s2413
+
+	s.SetInput([]string{
+		"Button A: X+94, Y+34",
+		"Button B: X+22, Y+67",
+		"Prize: X=8400, Y=5400",
+		"",
+		"Button A: X+26, Y+66",
+		"Button B: X+67, Y+21",
+		"Prize: X=12748, Y=12176",
+		"",
+		"Button A: X+17, Y+86",
+		"Button B: X+84, Y+37",
+		"Prize: X=7870, Y=6450",
+		"",
+		"Button A: X+69, Y+23",
+		"Button B: X+27, Y+71",
+		"Prize: X=18641, Y=10279",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "480", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	// This is not given on the AoC website, but is the expected result
+	assert.Equal(t, "875318608908", result)
+
+	s.SetInput(ReadFile("./data/2024/03/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "35729", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "88584689879723", result)
+}
+
+func Test_s2414(t *testing.T) {
+	var s s2414
+
+	s.SetInput([]string{
+		"p=0,4 v=3,-3",
+		"p=6,3 v=-1,-3",
+		"p=10,3 v=-1,2",
+		"p=2,0 v=2,-1",
+		"p=0,0 v=1,3",
+		"p=3,0 v=-2,-2",
+		"p=7,6 v=-1,-3",
+		"p=3,0 v=-1,-2",
+		"p=9,3 v=2,3",
+		"p=7,3 v=-1,2",
+		"p=2,4 v=2,-3",
+		"p=9,5 v=-3,-3",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "12", result)
+
+	s.SetInput(ReadFile("./data/2024/14/input.txt"))
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "221616000", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "7572", result)
+}
