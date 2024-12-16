@@ -191,7 +191,7 @@ func (s *s2415) processPart2() int {
 			// add touching boxes until we don't add any more
 			for len(boxes) > oldLength {
 				oldLength = len(boxes)
-				for t, _ := range boxes {
+				for t := range boxes {
 					newTargetLeft := [2]int{t[0] + directions[m][0], t[1] + directions[m][1]}
 					newTargetRight := [2]int{t[0] + directions[m][0], t[1] + directions[m][1] + 1}
 					if grid[newTargetLeft] == '[' || grid[newTargetLeft] == ']' {
@@ -211,7 +211,7 @@ func (s *s2415) processPart2() int {
 
 			// check if any boxes would move into a wall
 			move := true
-			for t, _ := range boxes {
+			for t := range boxes {
 				newTargetLeft := [2]int{t[0] + directions[m][0], t[1] + directions[m][1]}
 				newTargetRight := [2]int{t[0] + directions[m][0], t[1] + directions[m][1] + 1}
 				if grid[newTargetLeft] == '#' || grid[newTargetRight] == '#' {
@@ -229,12 +229,12 @@ func (s *s2415) processPart2() int {
 				if s.Debug {
 					fmt.Println(boxes)
 				}
-				for t, _ := range boxes {
+				for t := range boxes {
 					newGrid[t] = '.'
 					newGrid[[2]int{t[0], t[1] + 1}] = '.'
 				}
 				// move all the boxes to their new destination
-				for t, _ := range boxes {
+				for t := range boxes {
 					newTargetLeft := [2]int{t[0] + directions[m][0], t[1] + directions[m][1]}
 					newTargetRight := [2]int{t[0] + directions[m][0], t[1] + directions[m][1] + 1}
 					newGrid[newTargetLeft] = '['

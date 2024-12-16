@@ -29,10 +29,16 @@ func (s *s2413) SetPart(part int) error {
 }
 
 func (s *s2413) Solve() (string, error) {
-	return strconv.Itoa(s.Process()), nil
+	var number int
+	if s.Part != 2 {
+		number = s.processPart1()
+	} else {
+		number = s.processPart2()
+	}
+	return strconv.Itoa(number), nil
 }
 
-func (s *s2413) Process1() int {
+func (s *s2413) processPart1() int {
 	sum := 0
 	var claws []claw
 	var c claw
@@ -65,7 +71,7 @@ func (s *s2413) Process1() int {
 	return sum
 }
 
-func (s *s2413) Process() int {
+func (s *s2413) processPart2() int {
 	sum := 0
 	var claws []claw
 	var c claw

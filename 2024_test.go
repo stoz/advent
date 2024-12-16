@@ -454,7 +454,7 @@ func Test_s2413(t *testing.T) {
 	// This is not given on the AoC website, but is the expected result
 	assert.Equal(t, "875318608908", result)
 
-	s.SetInput(ReadFile("./data/2024/03/input.txt"))
+	s.SetInput(ReadFile("./data/2024/13/input.txt"))
 	s.SetPart(1)
 	result, err = s.Solve()
 	assert.NoError(t, err)
