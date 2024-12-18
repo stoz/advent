@@ -496,3 +496,53 @@ func Test_s2414(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "7572", result)
 }
+
+func Test_s2418(t *testing.T) {
+	var s s2418
+
+	s.SetInput([]string{
+		"5,4",
+		"4,2",
+		"4,5",
+		"3,0",
+		"2,1",
+		"6,3",
+		"2,4",
+		"1,5",
+		"0,6",
+		"3,3",
+		"2,6",
+		"5,1",
+		"1,2",
+		"5,5",
+		"2,5",
+		"6,5",
+		"1,4",
+		"0,4",
+		"6,4",
+		"1,1",
+		"6,1",
+		"1,0",
+		"0,5",
+		"1,6",
+		"2,0",
+	})
+	s.SetPart(1)
+	result, err := s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "22", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "6,1", result)
+
+	s.SetInput(ReadFile("./data/2024/18/input.txt"))
+	s.SetPart(1)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "338", result)
+	s.SetPart(2)
+	result, err = s.Solve()
+	assert.NoError(t, err)
+	assert.Equal(t, "20,44", result)
+}

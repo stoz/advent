@@ -276,6 +276,8 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			z = &s2414{}
 		case 15:
 			z = &s2415{}
+		case 18:
+			z = &s2418{}
 		}
 		data = ReadFile(fmt.Sprintf("./data/2024/%02d/%s", r.Day, f))
 		z.SetDebug(cli.Debug)
@@ -736,7 +738,7 @@ func Dijkstra(g map[int]map[int]GridPoint, t [2]int) int {
 	do := true
 	result := 999999
 	for do {
-		// start from the lowes-cost square
+		// start from the lowest-cost square
 		shortest := 999999
 		var cur [2]int
 		var point GridPoint
