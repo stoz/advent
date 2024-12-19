@@ -276,6 +276,8 @@ func (r *SolveCmd) Run(ctx *Context) error {
 			z = &s2414{}
 		case 15:
 			z = &s2415{}
+		case 16:
+			z = &s2416{}
 		case 17:
 			z = &s2417{}
 		case 18:
